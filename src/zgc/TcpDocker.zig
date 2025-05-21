@@ -33,7 +33,7 @@ const Error = error{
     RepeatedStart,
 };
 
-pub fn init(allocator: Self.Allocator) !Self {
+pub fn init(allocator: Self.Allocator) Self.Allocator.Error!Self {
     var result = Self{
         .private_data = undefined,
         .received = signal.SignalOne([]const u8).init(allocator),
@@ -48,7 +48,7 @@ pub fn deinit(self: Self) void {
     self.deinitPrivateData();
 }
 
-fn initPrivateData(self: *Self, allocator: Self.Allocator) !void {
+fn initPrivateData(self: *Self, allocator: Self.Allocator) Self.Allocator.Error!void {
     var private_data = Self.PrivateData{
         .self_allocator = std.heap.ArenaAllocator.init(allocator),
         .connection = null,
@@ -78,7 +78,7 @@ fn getPrivateDataPtr(self: *Self) *Self.PrivateData {
 }
 
 /// 启动服务器
-pub fn start(self: *Self, name: []const u8, port: u16) !void {
+pub fn start(self: *Self, name: []const u8, port: u16) anyerror!void {
     try self.ensureStopped();
 
     const address = try std.net.Address.parseIp(name, port);
@@ -116,7 +116,7 @@ pub fn send(self: Self, data: []const u8) (Self.Error || std.net.Stream.WriteErr
 /// **阻塞函数** ，读取至 `\x00` 时返回
 ///
 /// 调用者 **需要** 管理返回的内存
-pub fn receive(self: Self, allocator: Self.Allocator) ![]u8 {
+pub fn receive(self: Self, allocator: Self.Allocator) anyerror![]u8 {
     try self.ensureStarted();
 
     const pd = self.getPrivateData();
@@ -139,7 +139,7 @@ pub fn canReceive(self: Self) bool {
 }
 
 /// 检查 Stream 是否有数据可读（非阻塞）
-fn isStreamReadable(stream: std.net.Stream) !bool {
+fn isStreamReadable(stream: std.net.Stream) std.posix.PollError!bool {
     var poll_fds = [_]std.posix.pollfd{
         .{ .fd = stream.handle, .events = std.posix.POLL.IN, .revents = 0 },
     };
