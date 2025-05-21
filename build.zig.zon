@@ -65,6 +65,11 @@
         //    // actually used.
         //    .lazy = false,
         //},
+        .ZigSignal = .{
+            .url = "https://github.com/TongVan520/ZigSignal/archive/refs/heads/main.zip",
+            .hash = "ZigSignal-0.1.0-JlpR73Q4AADLryNNMD7zFzK0JqeGP1I6Ja7ZSqB26EjA",
+            .lazy = false,
+        },
     },
 
     // Specifies the set of files and directories that are included in this package.

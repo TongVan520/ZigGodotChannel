@@ -26,6 +26,9 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    const zig_signal = b.dependency("ZigSignal", .{});
+    exe_mod.addImport("signal", zig_signal.module("zig-signal"));
+
     // This creates another `std.Build.Step.Compile`, but this one builds an executable
     // rather than a static library.
     const exe = b.addExecutable(.{
